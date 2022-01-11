@@ -25,7 +25,7 @@ def main():
         if not possible:
             break
 
-        # check for letter matches (orange case)
+        # check for letter matches (Orange case)
         for i, c in enumerate(inp):
             word_char = w[i]
             rem_letters = [w[b] for b in blanks]
