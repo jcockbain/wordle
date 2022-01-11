@@ -1,9 +1,7 @@
-from collections import Counter
-import posix
-
 def find(s, ch):
     return [i for i, ltr in enumerate(s) if ltr == ch]
 
+# TODO: take as input
 tried = set(["a","e","s"])
 
 # check for exact matches (Green case)
@@ -53,9 +51,11 @@ def main():
                 d[c] = 1
             else:
                 d[c] += 1
+
     for g in guessed:
         # correct for letters already in the guess
-        d[g] -= len(possible_words)
+        if g in d:
+            d[g] -= len(possible_words)
  
     print("\n<--Count of Letters in Possible Words-->\n")
     sort_orders = sorted(d.items(), key=lambda x: x[1], reverse=True)
