@@ -1,8 +1,5 @@
-def find(s, ch):
-    return [i for i, ltr in enumerate(s) if ltr == ch]
-
 # TODO: take as input
-tried = set()
+tried_letters = set()
 
 # check for exact matches (Green case)
 def green_match(word, inp):
@@ -15,7 +12,7 @@ def green_match(word, inp):
 
 # check for right letter, wrong pos (Orange case)
 def orange_match(word, inp):
-    blanks = find(inp, "_")
+    blanks = [i for i, ltr in enumerate(inp) if ltr == '_']
     rem_letters = [word[b] for b in blanks]
     for i, c in enumerate(inp):
         word_char = word[i]
@@ -24,8 +21,10 @@ def orange_match(word, inp):
                 return False
     return True
 
+
 def contains_tried_letter(word):
-    return any([c in tried for c in word])
+    return any([c in tried_letters for c in word])
+
 
 def main():
     with open("words.txt") as f:
@@ -39,8 +38,8 @@ def main():
     for w in words:
         if green_match(w, inp) and orange_match(w, inp) and not contains_tried_letter(w):
             possible_words.append(w)
-        
-    print(f"\nThere {len(possible_words)} possible word(s)\n")   
+
+    print(f"\nThere {len(possible_words)} possible word(s)\n")
     print(possible_words)
 
     guessed = [x.lower() for x in inp if x != "_"]
@@ -56,7 +55,7 @@ def main():
         # correct for letters already in the guess
         if g in d:
             d[g] -= len(possible_words)
- 
+
     print("\n<--Count of Letters in Possible Words-->\n")
     sort_orders = sorted(d.items(), key=lambda x: x[1], reverse=True)
     print(sort_orders)
@@ -70,7 +69,7 @@ def main():
                 score += d[c]
                 seen.add(c)
         scores[w] = score
-    
+
     print("\n<--Weighted Score of Possible Words-->\n")
     sort_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     print(sort_scores[:20])
