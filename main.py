@@ -31,7 +31,7 @@ def main():
     with open("words.txt") as f:
         words = [line.rstrip('\n') for line in f]
     words.sort()
-    inp = input("What is your input?\n")
+    inp = input("What is your input?\n\n")
     if len(inp) != 5:
         raise Exception("Need input to be length 5!")
 
@@ -40,7 +40,7 @@ def main():
         if green_match(w, inp) and orange_match(w, inp) and not contains_tried_letter(w):
             possible_words.append(w)
         
-    print(f"There {len(possible_words)} possible word(s)\n")   
+    print(f"\nThere {len(possible_words)} possible word(s)\n")   
     print(possible_words)
 
     guessed = [x.lower() for x in inp if x != "_"]

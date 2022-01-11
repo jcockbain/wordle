@@ -19,7 +19,9 @@ For example:
 
 ```shell
 What is your input?
-pRE__  
+
+pRE__
+
 There 5 possible word(s)
 
 ['creep', 'crepe', 'crept', 'greps', 'treap']
