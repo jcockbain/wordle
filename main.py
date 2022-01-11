@@ -14,6 +14,7 @@ def main():
     
     for w in word_dict:
         possible = True
+        rem_letters = [w[b] for b in blanks]
         
         # check for exact matches (Green case)
         for i, c in enumerate(inp):
@@ -22,13 +23,11 @@ def main():
                 if word_char != c.lower():
                     possible = False
                     break
-        if not possible:
-            break
+    
 
         # check for letter matches (Orange case)
         for i, c in enumerate(inp):
             word_char = w[i]
-            rem_letters = [w[b] for b in blanks]
             if c != "_" and c.islower():
                 if not(c in rem_letters and c != word_char):
                     possible = False
