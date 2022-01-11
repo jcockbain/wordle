@@ -4,7 +4,7 @@ A Python binary to help with Wordle.
 
 ## Instructions
 
-Requires Python3, no libraries used.
+Requires Python3.
 
 ```shell
 python3 main.py

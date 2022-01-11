@@ -1,8 +1,10 @@
+from typing import List, Dict
+
 # TODO: take as input
 tried_letters = set()
 
 # check for exact matches (Green case)
-def green_match(word, inp):
+def green_match(word: str, inp: str) -> bool:
     for i, c in enumerate(inp):
         word_char = word[i]
         if c != "_" and c.isupper():
@@ -11,7 +13,7 @@ def green_match(word, inp):
     return True
 
 # check for right letter, wrong pos (Orange case)
-def orange_match(word, inp):
+def orange_match(word: str, inp: str) -> bool:
     blanks = [i for i, ltr in enumerate(inp) if ltr == '_']
     rem_letters = [word[b] for b in blanks]
     for i, c in enumerate(inp):
@@ -22,8 +24,31 @@ def orange_match(word, inp):
     return True
 
 
-def contains_tried_letter(word):
+def contains_tried_letter(word: str) -> bool:
     return any([c in tried_letters for c in word])
+
+
+def get_letter_counter(possible_words: List[str])-> Dict[str, int]:
+    d = {}
+    for p in possible_words:
+        for c in p:
+            if c not in d:
+                d[c] = 1
+            else:
+                d[c] += 1
+    return d
+
+def get_word_scores_counter(possible_words: List[str], letter_counter: Dict[str, int]) -> Dict[str, int]:
+    scores = {}
+    for w in possible_words:
+        score, seen = 0, set()
+        for c in w:
+            # don't count duplicates
+            if c not in seen:
+                score += letter_counter[c]
+                seen.add(c)
+        scores[w] = score
+    return scores
 
 
 def main():
@@ -42,37 +67,18 @@ def main():
     print(f"\nThere {len(possible_words)} possible word(s)\n")
     print(possible_words)
 
-    guessed = [x.lower() for x in inp if x != "_"]
-    d = {}
-    for p in possible_words:
-        for c in p:
-            if c not in d:
-                d[c] = 1
-            else:
-                d[c] += 1
-
-    for g in guessed:
+    d = get_letter_counter(possible_words)
+    for g in [x.lower() for x in inp if x != "_"]:
         # correct for letters already in the guess
         if g in d:
             d[g] -= len(possible_words)
 
     print("\n<--Count of Letters in Possible Words-->\n")
-    sort_orders = sorted(d.items(), key=lambda x: x[1], reverse=True)
-    print(sort_orders)
+    print(sorted(d.items(), key=lambda x: x[1], reverse=True))
 
-    scores = {}
-    for w in possible_words:
-        score, seen = 0, set()
-        for c in w:
-            # don't count duplicates
-            if c not in seen:
-                score += d[c]
-                seen.add(c)
-        scores[w] = score
-
+    scores = get_word_scores_counter(possible_words, d)
     print("\n<--Weighted Score of Possible Words-->\n")
-    sort_scores = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    print(sort_scores[:20])
+    print(sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20])
 
 
 if __name__ == "__main__":
