@@ -2,7 +2,7 @@ def find(s, ch):
     return [i for i, ltr in enumerate(s) if ltr == ch]
 
 # TODO: take as input
-tried = set(["a","e","s"])
+tried = set()
 
 # check for exact matches (Green case)
 def green_match(word, inp):
@@ -31,7 +31,7 @@ def main():
     with open("words.txt") as f:
         words = [line.rstrip('\n') for line in f]
     words.sort()
-    inp = input("What is your input?\n\n")
+    inp = input("What is your input?\n")
     if len(inp) != 5:
         raise Exception("Need input to be length 5!")
 
@@ -63,8 +63,7 @@ def main():
 
     scores = {}
     for w in possible_words:
-        score = 0
-        seen = set()
+        score, seen = 0, set()
         for c in w:
             # don't count duplicates
             if c not in seen:
