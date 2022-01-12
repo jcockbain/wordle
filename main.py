@@ -14,7 +14,7 @@ def green_match(word: str, inp: str) -> bool:
 
 # check for right letter, wrong pos (Orange case)
 def orange_match(word: str, inp: str) -> bool:
-    blanks = [i for i, ltr in enumerate(inp) if ltr == '_']
+    blanks = [i for i, ltr in enumerate(inp) if ltr == '_' or ltr.islower()]
     rem_letters = [word[b] for b in blanks]
     for i, c in enumerate(inp):
         word_char = word[i]
