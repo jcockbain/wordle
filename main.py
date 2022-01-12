@@ -7,18 +7,21 @@ tried_letters = set()
 def green_match(word: str, inp: str) -> bool:
     return all([word[i] == c.lower() for i, c in enumerate(inp) if c.isupper()])
 
+
 # check for right letter, wrong pos (Orange case)
 def orange_match(word: str, inp: str) -> bool:
     # rem_letters equals all letters not yet picked
     rem_letters = [word[i] for i in range(0, 5) if not inp[i].isupper()]
-    return all([(c in rem_letters and c != word[i]) for i, c in enumerate(inp) if c.islower()])
+    return all(
+        [(c in rem_letters and c != word[i]) for i, c in enumerate(inp) if c.islower()]
+    )
 
 
 def contains_tried_letter(word: str) -> bool:
     return any([c in tried_letters for c in word])
 
 
-def get_letter_counter(possible_words: List[str])-> Dict[str, int]:
+def get_letter_counter(possible_words: List[str]) -> Dict[str, int]:
     d = {}
     for p in possible_words:
         for c in p:
@@ -28,7 +31,10 @@ def get_letter_counter(possible_words: List[str])-> Dict[str, int]:
                 d[c] += 1
     return d
 
-def get_word_scores_counter(possible_words: List[str], letter_counter: Dict[str, int]) -> Dict[str, int]:
+
+def get_word_scores_counter(
+    possible_words: List[str], letter_counter: Dict[str, int]
+) -> Dict[str, int]:
     scores = {}
     for w in possible_words:
         score, seen = 0, set()
@@ -43,7 +49,7 @@ def get_word_scores_counter(possible_words: List[str], letter_counter: Dict[str,
 
 def main():
     with open("words.txt") as f:
-        words = [line.rstrip('\n') for line in f]
+        words = [line.rstrip("\n") for line in f]
     words.sort()
     inp = input("What is your input?\n\n")
     if len(inp) != 5:
@@ -51,7 +57,11 @@ def main():
 
     possible_words = []
     for w in words:
-        if green_match(w, inp) and orange_match(w, inp) and not contains_tried_letter(w):
+        if (
+            green_match(w, inp)
+            and orange_match(w, inp)
+            and not contains_tried_letter(w)
+        ):
             possible_words.append(w)
 
     print(f"\nThere {len(possible_words)} possible word(s)\n")
