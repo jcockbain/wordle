@@ -5,23 +5,13 @@ tried_letters = set()
 
 # check for exact matches (Green case)
 def green_match(word: str, inp: str) -> bool:
-    for i, c in enumerate(inp):
-        word_char = word[i]
-        if c != "_" and c.isupper():
-            if word_char != c.lower():
-                return False
-    return True
+    return all([word[i] == c.lower() for i, c in enumerate(inp) if c.isupper()])
 
 # check for right letter, wrong pos (Orange case)
 def orange_match(word: str, inp: str) -> bool:
-    blanks = [i for i, ltr in enumerate(inp) if ltr == '_' or ltr.islower()]
-    rem_letters = [word[b] for b in blanks]
-    for i, c in enumerate(inp):
-        word_char = word[i]
-        if c != "_" and c.islower():
-            if not(c in rem_letters and c != word_char):
-                return False
-    return True
+    # rem_letters equals all letters not yet picked
+    rem_letters = [word[i] for i in range(0, 5) if not inp[i].isupper()]
+    return all([(c in rem_letters and c != word[i]) for i, c in enumerate(inp) if c.islower()])
 
 
 def contains_tried_letter(word: str) -> bool:
