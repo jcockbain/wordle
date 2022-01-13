@@ -2,6 +2,58 @@ from typing import List, Dict, Set
 from collections import Counter
 from functools import reduce
 
+
+class WordleHelper:
+    def __init__(self, words_list):
+        self.tried_letters = set()
+        self.invalid_letter_per_pos = {}
+        self.possible_words = words_list
+
+    def run(self):
+        for step in range(0, 6):
+            print(f"\n<--Step {step}-->")
+            guess = input("\n\nWhat was your guess?\n\n")
+            result = input("\nWhat was the result?\n\n")
+            if len(result) != 5 or len(guess) != 5:
+                raise Exception("Need both inputs to be length 5!")
+            if not "_" in result:
+                print("Congrats!")
+                return
+
+            for i, c in enumerate(result):
+                if c == "_":
+                    self.tried_letters.add(guess[i])
+
+            # get all possible words
+            self.possible_words = [
+                w
+                for w in self.possible_words
+                if green_match(w, result)
+                and orange_match(w, result)
+                and not contains_tried_letter(w, self.tried_letters)
+            ]
+            print(f"\nThere {len(self.possible_words)} possible word(s):\n")
+            print(self.possible_words)
+
+            # get the most popular letters in the possible words
+            d = get_letter_counter(self.possible_words)
+            print(d)
+            for g in [x.lower() for x in result if x != "_"]:
+                # correct for letters already in the guess
+                if g in d:
+                    d[g] -= len(self.possible_words)
+            print(
+                f"\n<--Count of Letters in Possible Words-->\n\n{sorted(d.items(), key=lambda x: x[1], reverse=True)}"
+            )
+
+            # rank the common words by frequency of the most common letters
+            scores = get_word_scores_counter(self.possible_words, d)
+            print(
+                f"\n<--Weighted Score of Possible Words-->\n\n{sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
+            )
+        print("Too many steps!")
+
+
 # check for exact matches (Green case)
 def green_match(word: str, inp: str) -> bool:
     return all([word[i] == c.lower() for i, c in enumerate(inp) if c.isupper()])
@@ -47,41 +99,9 @@ def main():
     with open("words.txt") as f:
         words = [line.rstrip("\n") for line in f]
     words.sort()
-    inp = input("What is your input?\n\n")
-    if len(inp) != 5:
-        raise Exception("Need input to be length 5!")
-    invalid_letters_input = input(
-        "\nWhat letters are are invalid? (enter as a string e.g abfg)\n\n"
-    )
-    tried_letters = set([s for s in invalid_letters_input])
 
-    # get all possible words
-    possible_words = [
-        w
-        for w in words
-        if green_match(w, inp)
-        and orange_match(w, inp)
-        and not contains_tried_letter(w, tried_letters)
-    ]
-    print(f"\nThere {len(possible_words)} possible word(s):\n")
-    print(possible_words)
-
-    # get the most popular letters in the possible words
-    d = get_letter_counter(possible_words)
-    print(d)
-    for g in [x.lower() for x in inp if x != "_"]:
-        # correct for letters already in the guess
-        if g in d:
-            d[g] -= len(possible_words)
-    print(
-        f"\n<--Count of Letters in Possible Words-->\n\n{sorted(d.items(), key=lambda x: x[1], reverse=True)}"
-    )
-
-    # rank the common words by frequency of the most common letters
-    scores = get_word_scores_counter(possible_words, d)
-    print(
-        f"\n<--Weighted Score of Possible Words-->\n\n{sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
-    )
+    wh = WordleHelper(words)
+    wh.run()
 
 
 if __name__ == "__main__":
