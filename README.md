@@ -18,19 +18,23 @@ Where input is required, use:
 For example: 
 
 ```shell
-What is your input?
+What was your guess?
 
-pRE__
+print
 
-There 5 possible word(s)
+What was the result?
 
-['creep', 'crepe', 'crept', 'greps', 'treap']
+P_i_t
+
+There 7 possible word(s):
+
+['patio', 'pieta', 'piety', 'pitas', 'pitch', 'piths', 'pithy']
 
 <--Count of Letters in Possible Words-->
 
-[('c', 3), ('e', 2), ('t', 2), ('g', 1), ('s', 1), ('a', 1), ('r', 0), ('p', 0)]
+[('a', 3), ('h', 3), ('e', 2), ('y', 2), ('s', 2), ('o', 1), ('c', 1), ('p', 0), ('t', 0), ('i', 0)]
 
 <--Weighted Score of Possible Words-->
 
-[('crept', 7), ('creep', 5), ('crepe', 5), ('treap', 5), ('greps', 4)]
+[('pieta', 5), ('pitas', 5), ('piths', 5), ('pithy', 5), ('patio', 4), ('piety', 4), ('pitch', 4)]
 ```

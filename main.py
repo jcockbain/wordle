@@ -12,7 +12,7 @@ class WordleHelper:
     def run(self):
         for step in range(0, 6):
             print(f"\n<--Step {step}-->")
-            guess = input("\n\nWhat was your guess?\n\n")
+            guess = input("\nWhat was your guess?\n\n")
             result = input("\nWhat was the result?\n\n")
             if len(result) != 5 or len(guess) != 5:
                 raise Exception("Need both inputs to be length 5!")
@@ -37,7 +37,6 @@ class WordleHelper:
 
             # get the most popular letters in the possible words
             d = get_letter_counter(self.possible_words)
-            print(d)
             for g in [x.lower() for x in result if x != "_"]:
                 # correct for letters already in the guess
                 if g in d:
