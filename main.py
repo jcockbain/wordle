@@ -12,13 +12,18 @@ class WordleHelper:
     def run(self):
         for step in range(0, 6):
             print(f"\n<--Step {step}-->")
-            guess = input("\nWhat was your guess?\n\n")
-            result = input("\nWhat was the result?\n\n")
-            if len(result) != 5 or len(guess) != 5:
-                raise Exception("Need both inputs to be length 5!")
-            if not "_" in result:
-                print("Congrats!")
-                return
+            while 1:
+                guess = input("\nWhat was your guess?\n\n")
+                if is_valid_guess(guess):
+                    break
+                else:
+                    print("Invalid guess, enter a lower case word of length 5")
+            while 1:
+                result = input("\nWhat was the result?\n\n")
+                if is_valid_result(result):
+                    break
+                else:
+                    print("Invalid guess, a word of length 5")
 
             for i, c in enumerate(result):
                 if c == "_":
@@ -32,6 +37,9 @@ class WordleHelper:
                 and orange_match(w, result)
                 and not contains_tried_letter(w, self.tried_letters)
             ]
+
+            if len(self.possible_words) == 0:
+                raise Exception("No words left! :(")
             print(f"\nThere {len(self.possible_words)} possible word(s):\n")
             print(self.possible_words)
 
@@ -51,6 +59,14 @@ class WordleHelper:
                 f"\n<--Weighted Score of Possible Words-->\n\n{sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
             )
         print("Too many steps!")
+
+
+def is_valid_guess(inp: str) -> bool:
+    return len(inp) == 5 and all([c.islower() for c in inp])
+
+
+def is_valid_result(inp: str) -> bool:
+    return len(inp) == 5
 
 
 # check for exact matches (Green case)
@@ -98,7 +114,6 @@ def main():
     with open("words.txt") as f:
         words = [line.rstrip("\n") for line in f]
     words.sort()
-
     wh = WordleHelper(words)
     wh.run()
 
