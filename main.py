@@ -1,9 +1,6 @@
-from typing import List, Dict
+from typing import List, Dict, Set
 from collections import Counter
 from functools import reduce
-
-# TODO: take as input
-tried_letters = set()
 
 # check for exact matches (Green case)
 def green_match(word: str, inp: str) -> bool:
@@ -19,12 +16,16 @@ def orange_match(word: str, inp: str) -> bool:
     )
 
 
-def contains_tried_letter(word: str) -> bool:
+def contains_tried_letter(word: str, tried_letters: Set[str]) -> bool:
     return any([c in tried_letters for c in word])
 
 
 def get_letter_counter(possible_words: List[str]) -> Dict[str, int]:
-    return reduce((lambda x, y: Counter(x) + Counter(y)), possible_words)
+    return (
+        reduce((lambda x, y: Counter(x) + Counter(y)), possible_words)
+        if len(possible_words) > 1
+        else Counter(possible_words[0])
+    )
 
 
 def get_word_scores_counter(
@@ -49,18 +50,25 @@ def main():
     inp = input("What is your input?\n\n")
     if len(inp) != 5:
         raise Exception("Need input to be length 5!")
+    invalid_letters_input = input(
+        "\nWhat letters are are invalid? (enter as a string e.g abfg)\n\n"
+    )
+    tried_letters = set([s for s in invalid_letters_input])
 
     # get all possible words
     possible_words = [
         w
         for w in words
-        if green_match(w, inp) and orange_match(w, inp) and not contains_tried_letter(w)
+        if green_match(w, inp)
+        and orange_match(w, inp)
+        and not contains_tried_letter(w, tried_letters)
     ]
     print(f"\nThere {len(possible_words)} possible word(s):\n")
     print(possible_words)
 
     # get the most popular letters in the possible words
     d = get_letter_counter(possible_words)
+    print(d)
     for g in [x.lower() for x in inp if x != "_"]:
         # correct for letters already in the guess
         if g in d:

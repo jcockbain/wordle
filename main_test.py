@@ -1,7 +1,7 @@
 import unittest
 from unittest.case import TestCase
 
-from main import green_match, orange_match
+from main import contains_tried_letter, green_match, orange_match
 
 
 class TestMain(unittest.TestCase):
@@ -33,6 +33,16 @@ class TestMain(unittest.TestCase):
         for t in false_cases:
             word, inp = t
             self.assertFalse(orange_match(word, inp))
+
+    def test_contains_tried_letters(self):
+        invalid_letters = set(["s"])
+        true_cases = ["aides"]
+        for t in true_cases:
+            self.assertTrue(contains_tried_letter(t, invalid_letters))
+
+        false_cases = ["anted"]
+        for t in false_cases:
+            self.assertFalse(contains_tried_letter(t, invalid_letters))
 
 
 if __name__ == "__main__":
