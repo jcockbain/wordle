@@ -1,12 +1,12 @@
-from typing import List, Dict, Set
-from collections import Counter
+from typing import List, Dict
+from collections import Counter, defaultdict
 from functools import reduce
 
 
 class WordleHelper:
     def __init__(self, words_list):
-        self.tried_letters = set()
-        self.invalid_letter_per_pos = {}
+        #  map position to all letters that cannot be there
+        self.invalid_letter_per_pos = defaultdict(lambda: [])
         self.possible_words = words_list
 
     def run(self):
@@ -25,40 +25,52 @@ class WordleHelper:
                 else:
                     print("Invalid guess, a word of length 5")
 
-            for i, c in enumerate(result):
-                if c == "_":
-                    self.tried_letters.add(guess[i])
+            self.run_step(guess, result)
 
-            # get all possible words
-            self.possible_words = [
-                w
-                for w in self.possible_words
-                if green_match(w, result)
-                and orange_match(w, result)
-                and not contains_tried_letter(w, self.tried_letters)
-            ]
-
-            if len(self.possible_words) == 0:
-                raise Exception("No words left! :(")
-            print(f"\nThere {len(self.possible_words)} possible word(s):\n")
-            print(self.possible_words)
-
-            # get the most popular letters in the possible words
-            d = get_letter_counter(self.possible_words)
-            for g in [x.lower() for x in result if x != "_"]:
-                # correct for letters already in the guess
-                if g in d:
-                    d[g] -= len(self.possible_words)
-            print(
-                f"\n<--Count of Letters in Possible Words-->\n\n{sorted(d.items(), key=lambda x: x[1], reverse=True)}"
-            )
-
-            # rank the common words by frequency of the most common letters
-            scores = get_word_scores_counter(self.possible_words, d)
-            print(
-                f"\n<--Weighted Score of Possible Words-->\n\n{sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
-            )
         print("Too many steps!")
+
+    def run_step(self, guess: str, result: str):
+        self.update_invalid_letters(result, guess)
+
+        # get all possible words
+        self.possible_words = [
+            w
+            for w in self.possible_words
+            if green_match(w, result)
+            and orange_match(w, result)
+            and not self.contains_already_tried_letter(w)
+        ]
+
+        if len(self.possible_words) == 0:
+            raise Exception("No words left! :(")
+        print(f"\nThere {len(self.possible_words)} possible word(s):\n")
+
+        # get the most popular letters in the possible words
+        d = get_letter_counter(self.possible_words)
+        for g in [x.lower() for x in result if x != "_"]:
+            # correct for letters already in the guess
+            if g in d:
+                d[g] -= len(self.possible_words)
+        print(
+            f"\n<--Count of Letters in Possible Words-->\n\n{sorted(d.items(), key=lambda x: x[1], reverse=True)}"
+        )
+
+        # rank the common words by frequency of the most common letters
+        scores = get_word_scores_counter(self.possible_words, d)
+        print(
+            f"\n<--Weighted Score of Possible Words-->\n\n{sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
+        )
+
+    def update_invalid_letters(self, result: str, guess: str):
+        for i, c in enumerate(result):
+            if c == "_":
+                for j in range(0, 5):
+                    self.invalid_letter_per_pos[j].append(guess[i])
+            if c.islower():
+                self.invalid_letter_per_pos[i].append(guess[i])
+
+    def contains_already_tried_letter(self, word: str) -> bool:
+        return any([c in self.invalid_letter_per_pos[i] for i, c in enumerate(word)])
 
 
 def is_valid_guess(inp: str) -> bool:
@@ -81,10 +93,6 @@ def orange_match(word: str, inp: str) -> bool:
     return all(
         [(c in rem_letters and c != word[i]) for i, c in enumerate(inp) if c.islower()]
     )
-
-
-def contains_tried_letter(word: str, tried_letters: Set[str]) -> bool:
-    return any([c in tried_letters for c in word])
 
 
 def get_letter_counter(possible_words: List[str]) -> Dict[str, int]:
