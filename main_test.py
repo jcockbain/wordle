@@ -5,7 +5,7 @@ from main import WordleHelper, green_match, orange_match
 
 class TestMain(unittest.TestCase):
     def test_run_step(self):
-        
+
         words = ["label", "cable", "table"]
         guess = "fable"
         result = "_ABle"
