@@ -1,7 +1,8 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from collections import Counter, defaultdict
 from functools import reduce
 
+NUMBER_OF_STEPS = 6
 
 class WordleHelper:
     def __init__(self, words_list):
@@ -10,7 +11,7 @@ class WordleHelper:
         self.possible_words = words_list
 
     def run(self):
-        for step in range(0, 6):
+        for step in range(0, NUMBER_OF_STEPS):
             print(f"\n<--Step {step}-->")
             while 1:
                 guess = input("\nWhat was your guess?\n\n")
@@ -43,7 +44,7 @@ class WordleHelper:
 
         if len(self.possible_words) == 0:
             raise Exception("No words left! :(")
-        print(f"\nThere {len(self.possible_words)} possible word(s):\n")
+        print(f"\nThere {len(self.possible_words)} possible word(s): {self.possible_words}\n")
 
         # get the most popular letters in the possible words
         d = get_letter_counter(self.possible_words)
@@ -55,17 +56,24 @@ class WordleHelper:
             f"\n<--Count of Letters in Possible Words-->\n\n{sorted(d.items(), key=lambda x: x[1], reverse=True)}"
         )
 
-        # rank the common words by frequency of the most common letters
-        scores = get_word_scores_counter(self.possible_words, d)
+        common_pos = get_likely_letter_pos(self.possible_words)
         print(
-            f"\n<--Weighted Score of Possible Words-->\n\n{sorted(scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
+            f"\n<--Most likely letter positions:-->\n\n{sorted(common_pos.items(), key=lambda x: x[1], reverse=True)[:30]}"
+        )
+
+        # rank the common words by frequency of the most common letters
+        scores = get_word_scores_counter(self.possible_words, d, common_pos)
+        rounded_scores = {k: round(v, 2) for k, v in scores.items()}
+        print(
+            f"\n<--Weighted Score of Possible Words-->\n\n{sorted(rounded_scores.items(), key=lambda x: x[1], reverse=True)[:20]}"
         )
 
     def update_invalid_letters(self, result: str, guess: str):
         for i, c in enumerate(result):
             if c == "_":
                 for j in range(0, 5):
-                    self.invalid_letter_per_pos[j].append(guess[i])
+                    if result[j] != guess[i].upper():
+                        self.invalid_letter_per_pos[j].append(guess[i])
             if c.islower():
                 self.invalid_letter_per_pos[i].append(guess[i])
 
@@ -103,16 +111,24 @@ def get_letter_counter(possible_words: List[str]) -> Dict[str, int]:
     )
 
 
+def get_likely_letter_pos(possible_words: List[str]) -> Dict[Tuple[str, int], int]:
+    d = defaultdict(lambda: 0)
+    for w in possible_words:
+        for i, c in enumerate(w):
+            d[(c, i)] += 1
+    return d
+
+
 def get_word_scores_counter(
-    possible_words: List[str], letter_counter: Dict[str, int]
+    possible_words: List[str], letter_counter: Dict[str, int], pos_counter: Dict[Tuple[str,int], int]
 ) -> Dict[str, int]:
     scores = {}
     for w in possible_words:
         score, seen = 0, set()
-        for c in w:
-            # don't count duplicates (as these are less useful
+        for i, c in enumerate(w):
+            # don't count duplicates (as these are less useful)
             if c not in seen:
-                score += letter_counter[c]
+                score += (0.01 * pos_counter[(c, i)]) * letter_counter[c]
                 seen.add(c)
         scores[w] = score
     return scores
