@@ -1,10 +1,17 @@
 import unittest
-from unittest.case import TestCase
 
-from main import green_match, orange_match
+from main import WordleHelper, green_match, orange_match
 
 
 class TestMain(unittest.TestCase):
+    def test_run_step(self):
+        words = ["label", "cable", "table"]
+        guess = "fable"
+        result = "_ABle"
+        wh = WordleHelper(words)
+        wh.run_step(guess, result)
+        self.assertEqual(["label"], wh.possible_words)
+
     def test_green_match(self):
 
         true_cases = {
